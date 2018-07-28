@@ -1,0 +1,10 @@
+{ 
+  "port": "8081",
+  "cors": {
+    "origin": "*",
+    "exposedHeaders": [
+      "total-count"
+    ],
+    "optionsSuccessStatus": 200
+  }
+}
