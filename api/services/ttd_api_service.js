@@ -1,22 +1,15 @@
-/**
- * Modules
- */
+// modules
 const HttpStatus = require('http-status-codes');
 const express = require('express');
 const config = require('config');
 const helmet = require('helmet');
 const cors = require('cors');
 const morgan = require('morgan');
-
-/**
- * Logging
- */
 const logger = require('../utils/logger');
 
-/**
- * Routers
- */
-const SampleRoute = require('../routers/sample_router');
+// routers
+const LevelsRouter = require('../routers/levels_router');
+const TutorialsRouter = require('../routers/tutorials_router');
 
 class APIService {
   constructor() {
@@ -34,7 +27,8 @@ class APIService {
   }
 
   createRouters() {
-    this.application.use(SampleRoute);
+    this.application.use(LevelsRouter);
+    this.application.use(TutorialsRouter);
   }
 
   get app() {
@@ -54,7 +48,7 @@ class APIService {
 
   /* eslint-enable no-unused-vars */
   static async connect() {
-    logger.info('Starting');
+    logger.info('Starting...');
   }
 }
 

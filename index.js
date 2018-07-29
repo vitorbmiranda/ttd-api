@@ -4,13 +4,9 @@ const ApiService = require('./api/services/ttd_api_service.js');
 
 const apiService = new ApiService();
 
-/* global gitCommitHash */ // eslint-disable-line no-unused-vars
 global.gitCommitHash = require('child_process').execSync('git log -1 --format=%H').toString().trim();
-/* global gitCommitDate */ // eslint-disable-line no-unused-vars
 global.gitCommitDate = require('child_process').execSync('git log -1 --format=%cd').toString().trim();
-/* global gitCommitBranch */ // eslint-disable-line no-unused-vars
 global.gitCommitBranch = require('child_process').execSync('git rev-parse --symbolic-full-name --abbrev-ref HEAD').toString().trim();
-/* global gitCommitMessage */ // eslint-disable-line no-unused-vars
 global.gitCommitMessage = require('child_process').execSync('git log -1 --format=%B').toString().trim();
 
 ApiService.connect()
