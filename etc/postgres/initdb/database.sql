@@ -1,0 +1,7 @@
+CREATE ROLE ttd WITH PASSWORD 'ttd#1';
+ALTER ROLE "ttd" WITH LOGIN;
+
+CREATE DATABASE ttd
+    WITH
+    OWNER = ttd
+    ENCODING = 'UTF8';

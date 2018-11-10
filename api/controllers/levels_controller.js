@@ -1,12 +1,10 @@
-const { fetchLevels } = require('../services/levels/levels_service');
-const { GAME_KEYS } = require('../utils/constants');
-
-const validateGame = game => (game && GAME_KEYS.includes(game.toUpperCase()));
+const { fetchLevels } = require('../services/levels_service');
+const { isValidGame } = require('../utils/level_utils');
 
 const getLevels = async (request, response) => {
   try {
     const { query: { game } } = request;
-    if (!validateGame(game)) {
+    if (!isValidGame(game)) {
       return response.status(400).send({ error: { code: 'INVALID_PARAMETER', message: 'Invalid \'game\' parameter' } });
     }
     const levels = await fetchLevels(game);

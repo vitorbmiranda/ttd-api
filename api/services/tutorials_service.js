@@ -1,3 +1,5 @@
+const db = require('../db/db');
+
 const TUTORIALS = {
   DAM: [
     {
@@ -33,13 +35,19 @@ const TUTORIALS = {
   ],
 };
 
-const fetchTutorials = async (level) => {
+const selectTutorials = async (level) => {
   if (level.toUpperCase() in TUTORIALS) {
     return TUTORIALS[level.toUpperCase()];
   }
   return [];
 };
 
+const insertTutorial = async (tutorial) => {
+  await db.models.Tutorial.create(tutorial);
+  return true;
+};
+
 module.exports = {
-  fetchTutorials,
+  selectTutorials,
+  insertTutorial,
 };
