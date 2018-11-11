@@ -1,14 +1,23 @@
 const config = require('config');
+const express = require('express');
+const helmet = require('helmet');
+const cors = require('cors');
+const morgan = require('morgan');
+
 const logger = require('./api/utils/logger');
-const ApiService = require('./api/services/ttd_api_service.js');
 
-const apiService = new ApiService();
+const LevelsRouter = require('./api/routers/levels_router');
+const TutorialsRouter = require('./api/routers/tutorials_router');
 
-ApiService.connect()
-  .then(() => apiService.app.listen(config.get('port'), () => {
-    logger.info(`Server successfully started on port: ${config.get('port')}`);
-  }))
-  .catch((error) => {
-    logger.info(`Error starting Express App. Reason: ${error.message}`);
-    process.exit(1);
-  });
+const app = express();
+app.use(express.json());
+app.use(cors(config.get('cors')));
+app.use(morgan('combined', { stream: logger.stream }));
+app.use(helmet());
+
+app.use(LevelsRouter);
+app.use(TutorialsRouter);
+
+app.listen(config.get('port'), () => {
+  logger.info(`Started on port: ${config.get('port')}`);
+});

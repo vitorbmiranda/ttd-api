@@ -1,32 +1,19 @@
-const winston = require('winston');
+const { createLogger, format, transports } = require('winston');
 
+const { combine, timestamp, printf } = format;
 
-function formatMessage(args) {
-  return `${new Date().toISOString()} ${args.message}`;
-}
+const loggerFormat = printf(info => `${info.timestamp} - [${info.level}] ${info.message}`);
 
-const options = {
-  console: {
-    formatter: formatMessage,
-    level: 'silly',
-    handleExceptions: true,
-    colorize: true,
-    json: false,
-    silent: (['test'].includes(process.env.NODE_ENV)),
-  },
-};
-
-const logger = winston.createLogger({
-  transports: [
-    new winston.transports.Console(options.console),
-  ],
-  exitOnError: false,
+const logger = createLogger({
+  level: 'silly',
+  format: combine(
+    timestamp(),
+    loggerFormat,
+  ),
+  transports: [new transports.Console()],
 });
 
-logger.stream = {
-  write(message) {
-    logger.info(message);
-  },
-};
+// stream hook for morgan
+logger.stream = { write(message) { logger.silly(message); } };
 
 module.exports = logger;
