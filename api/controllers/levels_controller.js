@@ -1,16 +1,25 @@
-const { fetchLevels } = require('../services/levels_service');
-const { isValidGame } = require('../utils/level_utils');
+const httpStatus = require('http-status-codes');
+const { selectLevels } = require('../services/levels_service');
+const { isValidGame, allGames } = require('../utils/level_utils');
+const { errorHandler, internalServerError, ok } = require('./helpers');
 
-const getLevels = async (request, response) => {
+const getLevels = async (req, res) => {
   try {
-    const { query: { game } } = request;
+    const { query: { game } } = req;
+
     if (!isValidGame(game)) {
-      return response.status(400).send({ error: { code: 'INVALID_PARAMETER', message: 'Invalid \'game\' parameter' } });
+      return errorHandler(
+        res,
+        'INVALID_GAME',
+        `Game has to be one of [${allGames()}]`,
+        httpStatus.BAD_REQUEST,
+      );
     }
-    const levels = await fetchLevels(game);
-    return response.status(200).send(levels);
+
+    const levels = await selectLevels(game);
+    return ok(res, levels);
   } catch (ex) {
-    return response.status(500).send({ error: { code: 'INTERNAL_SERVER_ERROR', message: 'An internal error occurred! You might want to check the server logs.' } });
+    return internalServerError(res, ex);
   }
 };
 

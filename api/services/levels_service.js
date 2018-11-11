@@ -1,18 +1,16 @@
-const LEVELS = {
-  GE: [
-    { name: 'Dam', key: 'DAM', tutorials: 3 },
-    { name: 'Facility', key: 'FACILITY', tutorials: 2 },
-    { name: 'Runway', key: 'RUNWAY', tutorials: 5 },
-  ],
-  PD: [
-    { name: 'Defection', key: 'DEFECTION', tutorials: 1 },
-    { name: 'Investigation', key: 'INVESTIGATION', tutorials: 7 },
-    { name: 'Extraction', key: 'EXTRACTION', tutorials: 18 },
-  ],
-};
+const sequelize = require('sequelize');
+const db = require('../db/db');
 
-const fetchLevels = async game => (LEVELS[game.toUpperCase()]);
+const selectLevels = async game => (
+  db.models.Tutorial.findAll({
+    attributes: ['level', [sequelize.fn('COUNT', sequelize.col('level')), 'total']],
+    group: 'level',
+    where: {
+      game,
+    },
+  })
+);
 
 module.exports = {
-  fetchLevels,
+  selectLevels,
 };

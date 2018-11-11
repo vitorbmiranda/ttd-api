@@ -1,29 +1,59 @@
-const { selectTutorials, insertTutorial } = require('../services/tutorials_service');
-const { isValidLevel } = require('../utils/level_utils');
+const httpStatus = require('http-status-codes');
+const { selectTutorials, selectTutorialById, insertTutorial } = require('../services/tutorials_service');
+const { isValidLevel, allLevels } = require('../utils/level_utils');
+const {
+  errorHandler, internalServerError, ok, created,
+} = require('./helpers');
 
-const getTutorials = async (request, response) => {
+const getTutorials = async (req, res) => {
   try {
-    const { query: { level } } = request;
+    const { query: { level } } = req;
+
     if (!isValidLevel(level)) {
-      return response.status(400).send({ error: { code: 'INVALID_PARAMETER', message: 'Invalid \'level\' parameter' } });
+      return errorHandler(
+        res,
+        'INVALID_LEVEL',
+        `Level has to be one of [${allLevels()}]`,
+        httpStatus.BAD_REQUEST,
+      );
     }
+
     const tutorials = await selectTutorials(level);
-    return response.status(200).send(tutorials);
+    return ok(res, tutorials);
   } catch (ex) {
-    return response.status(500).send({ error: { code: 'INTERNAL_SERVER_ERROR', message: 'An internal error occurred! You might want to check the server logs.' } });
+    return internalServerError(res, ex);
   }
 };
 
-const postTutorial = async (request, response) => {
+const getTutorialById = async (req, res) => {
+  const { params: { id } } = req;
   try {
-    await insertTutorial(request.body);
-    return response.status(201).end();
+    const tutorial = await selectTutorialById(id);
+    if (!tutorial) {
+      return errorHandler(
+        res,
+        'TUTORIAL_NOT_FOUND',
+        `Tutorial with id ${id} was not found`,
+        httpStatus.NOT_FOUND,
+      );
+    }
+    return ok(res, tutorial);
   } catch (ex) {
-    return response.status(500).send({ error: { code: 'INTERNAL_SERVER_ERROR', message: 'An internal error occurred! You might want to check the server logs.' } });
+    return internalServerError(res, ex);
+  }
+};
+
+const postTutorial = async (req, res) => {
+  try {
+    const result = await insertTutorial(req.body);
+    return created(res, { id: result.id });
+  } catch (ex) {
+    return internalServerError(res, ex);
   }
 };
 
 module.exports = {
   getTutorials,
+  getTutorialById,
   postTutorial,
 };
